@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MKDAV Confessions</title>
+    <title>MKDAV Portal</title>
     <style>
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
-            /* Dim Red/Terracotta Background */
-            background-color: #7f1d1d; 
+            background-color: #7f1d1d; /* Dim Red Background */
             color: #333;
             display: flex;
             justify-content: center;
@@ -18,7 +17,7 @@
             padding: 20px;
         }
         
-        /* The "Small White Platform" (the card) */
+        /* The White Platform */
         .card {
             background: #ffffff;
             padding: 35px 25px;
@@ -30,16 +29,12 @@
             border: 1px solid #e2e8f0;
         }
 
-        /* Title Style: Friendlier blue */
         h1 { color: #1a73e8; font-size: 1.7rem; margin-top: 0; margin-bottom: 5px; }
-        
-        /* Paragraph style */
         p { color: #5f6368; font-size: 0.95rem; margin-bottom: 25px; line-height: 1.4; }
 
-        /* Hide Page 2 initially */
-        #page2 { display: none; }
+        /* Hide pages initially */
+        #page2, #page3 { display: none; }
 
-        /* Input styling for white platform */
         input, textarea {
             width: 100%;
             padding: 12px;
@@ -58,7 +53,7 @@
             box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
         }
 
-        /* Submit Button: Friendlier green */
+        /* Standard Submit Button */
         .btn {
             background-color: #34a853;
             color: white;
@@ -72,10 +67,9 @@
             transition: 0.3s;
             margin-top: 5px;
         }
-
         .btn:hover { background-color: #1e8e3e; }
 
-        /* Navigation Button: Blue outline style */
+        /* Navigation Button */
         .nav-btn {
             background-color: transparent;
             color: #1a73e8;
@@ -91,6 +85,24 @@
         }
         .nav-btn:hover { background-color: rgba(26, 115, 232, 0.05); }
 
+        /* Big Options for Home Page */
+        .option-btn {
+            background-color: #f8fafc;
+            color: #1a73e8;
+            border: 2px solid #1a73e8;
+            padding: 20px;
+            width: 100%;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-bottom: 15px;
+            display: block;
+            box-sizing: border-box;
+        }
+        .option-btn:hover { background-color: #1a73e8; color: white; transform: translateY(-2px); }
+
         .back-btn {
             color: #5f6368;
             font-size: 0.9rem;
@@ -105,33 +117,42 @@
 
     <form action="https://formspree.io/f/xjgpeyvq" method="POST" class="card">
         
+        <input type="hidden" name="Message_Type" id="message_type" value="">
+
         <div id="page1">
             <h1>Verification</h1>
-            <p>Please verify your identity to enter the confession room.</p>
+            <p>Please verify your identity to enter.</p>
             
             <input type="text" name="First_Name" id="fname" placeholder="First Name" required>
             <input type="text" name="Last_Name" id="lname" placeholder="Last Name" required>
             <input type="email" name="Email" id="email" placeholder="Gmail Address" required>
             
-            <button type="button" class="nav-btn" onclick="goToConfession()">Enter Room</button>
+            <button type="button" class="nav-btn" onclick="goToHome()">Log In</button>
         </div>
 
         <div id="page2">
             <h1>MKDAV Public School</h1>
-            <p>Write your confession here with anonymity.</p>
+            <p>Welcome. Please select an option below.</p>
             
-            <textarea name="Confession" rows="6" placeholder="I confess that..." required></textarea>
+            <div class="option-btn" onclick="openForm('Confession')">🗣️ Confess</div>
+            <div class="option-btn" onclick="openForm('Feedback')">📝 Feedback</div>
+        </div>
+
+        <div id="page3">
+            <h1 id="dynamic_title">Room</h1>
+            <p id="dynamic_desc">Write your message below.</p>
             
-            <button type="submit" class="btn">Submit Confession</button>
+            <textarea id="dynamic_box" name="Message" rows="6" placeholder="..." required></textarea>
+            
+            <button type="submit" class="btn">Submit</button>
             <br>
-            <span class="back-btn" onclick="goBack()">← Back to Verification</span>
+            <span class="back-btn" onclick="goBackToHome()">← Back to Home</span>
         </div>
 
     </form>
 
     <script>
-        // Use simpler hiding logic for mobile stability
-        function goToConfession() {
+        function goToHome() {
             // Check if Page 1 fields are full
             let fName = document.getElementById('fname').value;
             let lName = document.getElementById('lname').value;
@@ -141,16 +162,38 @@
                 document.getElementById('page1').style.display = 'none';
                 document.getElementById('page2').style.display = 'block';
             } else {
-                alert("Please fill out all fields to enter the confession room.");
+                alert("Please fill out your Name and Email to continue.");
             }
         }
 
-        function goBack() {
+        function openForm(type) {
+            // Hide Home, Show Form
             document.getElementById('page2').style.display = 'none';
-            document.getElementById('page1').style.display = 'block';
+            document.getElementById('page3').style.display = 'block';
+
+            // Change the text and tags based on what they clicked!
+            if (type === 'Confession') {
+                document.getElementById('dynamic_title').innerText = "Confession Room";
+                document.getElementById('dynamic_desc').innerText = "Write your confession here with anonymity.";
+                document.getElementById('dynamic_box').placeholder = "I confess that...";
+                document.getElementById('message_type').value = "🚨 CONFESSION";
+                document.getElementById('dynamic_box').name = "Confession_Text";
+            } else if (type === 'Feedback') {
+                document.getElementById('dynamic_title').innerText = "School Feedback";
+                document.getElementById('dynamic_desc').innerText = "Help us improve MKDAV.";
+                document.getElementById('dynamic_box').placeholder = "My feedback is...";
+                document.getElementById('message_type').value = "💡 FEEDBACK";
+                document.getElementById('dynamic_box').name = "Feedback_Text";
+            }
+        }
+
+        function goBackToHome() {
+            document.getElementById('page3').style.display = 'none';
+            document.getElementById('page2').style.display = 'block';
+            // Clear the text box if they go back
+            document.getElementById('dynamic_box').value = ""; 
         }
     </script>
 
 </body>
 </html>
-￼Enter
